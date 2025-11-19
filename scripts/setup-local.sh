@@ -49,7 +49,12 @@ echo ""
 # Check .env.local
 if [ ! -f .env.local ]; then
     echo -e "${YELLOW}Creating .env.local from template...${NC}"
-    cat > .env.local << 'EOF'
+    if [ -f .env.local.template ]; then
+        cp .env.local.template .env.local
+        echo -e "${GREEN}✅ .env.local created from template${NC}"
+    else
+        # Fallback: create from scratch
+        cat > .env.local << 'EOF'
 # Local Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
@@ -65,7 +70,8 @@ GOOGLE_GENERATIVE_AI_API_KEY=AIzaSyDoEIiDueJYRFcZ_3bPj7HgyDTMSdQXoIQ
 # Redis
 REDIS_URL=redis://localhost:6379
 EOF
-    echo -e "${GREEN}✅ .env.local created${NC}"
+        echo -e "${GREEN}✅ .env.local created${NC}"
+    fi
 else
     echo -e "${GREEN}✅ .env.local already exists${NC}"
 fi
