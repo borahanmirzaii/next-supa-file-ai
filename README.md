@@ -49,17 +49,32 @@ A comprehensive Next.js application that allows users to upload files, analyze t
 
 ```
 next-supa-file-ai/
-├── app/                    # Next.js App Router
-├── src/                    # Source code
-│   ├── components/        # React components
-│   ├── lib/              # Core libraries
-│   ├── services/         # Business logic layer
-│   ├── repositories/     # Data access layer
-│   ├── hooks/            # Custom React hooks
-│   └── types/            # TypeScript definitions
-├── mcp-servers/          # Custom MCP servers
-├── supabase/             # Database migrations & functions
-└── docs/                 # Documentation
+├── app/                      # Next.js App Router
+│   ├── (auth)/              # Authentication routes
+│   ├── (dashboard)/         # Dashboard routes with shared layout
+│   ├── actions/             # Server Actions
+│   └── api/                 # API routes
+├── components/              # React components
+│   ├── analysis/           # AI analysis components
+│   ├── auth/               # Authentication components
+│   ├── files/              # File management components
+│   ├── integrations/       # Platform integration components
+│   ├── knowledge-base/     # Knowledge base & RAG components
+│   ├── layout/             # Layout components (Sidebar)
+│   └── ui/                 # shadcn/ui components
+├── lib/                     # Core libraries
+│   ├── ai/                 # AI functionality (agents, extractors)
+│   ├── knowledge-base/     # Knowledge base utilities
+│   ├── mcp/                # Model Context Protocol
+│   ├── queue/              # Job queue (BullMQ)
+│   ├── repositories/       # Data access layer
+│   ├── supabase/           # Supabase clients & storage
+│   └── utils/              # Utility functions
+├── services/                # Business logic layer
+├── hooks/                   # Custom React hooks
+├── types/                   # TypeScript definitions
+├── supabase/                # Database migrations & config
+└── docs/                    # Documentation
 
 ```
 

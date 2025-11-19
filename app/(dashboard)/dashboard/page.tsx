@@ -23,7 +23,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/knowledge">
+        <Link href="/knowledge-base">
           <Card className="p-6 hover:bg-accent transition-colors cursor-pointer">
             <Database className="h-8 w-8 mb-4 text-primary" />
             <h3 className="text-lg font-semibold mb-2">Knowledge Base</h3>
