@@ -71,20 +71,20 @@ git clone <repository-url>
 cd next-supa-file-ai
 
 # Install dependencies
-npm install
+pnpm install
 
 # Setup environment variables
 cp .env.example .env.local
 # Edit .env.local with your credentials
 
 # Run Supabase locally (optional)
-npx supabase start
+pnpm exec supabase start
 
 # Run migrations
-npx supabase db push
+pnpm exec supabase db push
 
 # Start development server
-npm run dev
+pnpm run dev
 ```
 
 Visit http://localhost:3000

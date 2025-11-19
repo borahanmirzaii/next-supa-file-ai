@@ -10,7 +10,11 @@
 ## Step 1: Install Dependencies
 
 ```bash
-npm install
+# Install pnpm if you don't have it
+npm install -g pnpm
+
+# Install project dependencies
+pnpm install
 ```
 
 ## Step 2: Setup Supabase
@@ -112,7 +116,7 @@ GITHUB_OAUTH_CLIENT_SECRET=your_github_client_secret
 ## Step 5: Run Development Server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Visit http://localhost:3000

@@ -110,10 +110,14 @@ cp .env.local.example .env.local
 
 ### Local Development
 ```bash
-npm install
+# Install pnpm if needed
+npm install -g pnpm
+
+# Install dependencies
+pnpm install
 cp .env.local.example .env.local
 # Configure .env.local
-npm run dev
+pnpm run dev
 ```
 
 ### Docker/OrbStack
@@ -123,8 +127,8 @@ docker-compose -f docker-compose.dev.yml up
 
 ### Production Build
 ```bash
-npm run build
-npm start
+pnpm run build
+pnpm start
 ```
 
 ## 📊 Code Statistics

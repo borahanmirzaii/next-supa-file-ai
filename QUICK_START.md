@@ -47,7 +47,11 @@ ON CONFLICT (id) DO NOTHING;
 ### 3. Install Dependencies
 
 ```bash
-npm install --legacy-peer-deps
+# Install pnpm if you don't have it
+npm install -g pnpm
+
+# Install project dependencies
+pnpm install
 ```
 
 ### 4. Configure Environment
@@ -67,7 +71,7 @@ NODE_ENV=development
 ### 5. Start Development Server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Visit: **http://localhost:3000**
@@ -96,9 +100,9 @@ Database: postgresql://postgres:postgres@127.0.0.1:54322/postgres
 - Create manually via Studio UI
 - Or run the SQL INSERT statement above
 
-**npm install errors?**
-- Try: `npm install --legacy-peer-deps`
-- Or: `rm -rf node_modules package-lock.json && npm install`
+**pnpm install errors?**
+- Try: `pnpm install --no-frozen-lockfile`
+- Or: `rm -rf node_modules pnpm-lock.yaml && pnpm install`
 
 ## ✨ You're Ready!
 

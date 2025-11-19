@@ -2,6 +2,7 @@
   "name": "next-supa-file-ai",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.0.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,7 +13,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
-    "test:all": "npm run test:ci && npm run test:e2e"
+    "test:all": "pnpm test:ci && pnpm test:e2e"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.0.0",
@@ -72,4 +73,3 @@
     "autoprefixer": "^10.4.20"
   }
 }
-

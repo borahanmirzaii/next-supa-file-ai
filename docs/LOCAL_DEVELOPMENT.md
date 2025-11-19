@@ -15,7 +15,12 @@
 ```bash
 git clone <your-repo-url>
 cd next-supa-file-ai
-npm install
+
+# Install pnpm if you don't have it
+npm install -g pnpm
+
+# Install project dependencies
+pnpm install
 ```
 
 ### 2. Environment Setup
@@ -93,7 +98,7 @@ sudo systemctl start redis
 ### 5. Run Development Server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Visit http://localhost:3000
@@ -143,13 +148,13 @@ docker-compose -f docker-compose.dev.yml up
 
 ```bash
 # Unit tests
-npm run test
+pnpm run test
 
 # E2E tests
-npm run test:e2e
+pnpm run test:e2e
 
 # All tests
-npm run test:all
+pnpm run test:all
 ```
 
 ### Database Migrations
@@ -197,8 +202,8 @@ lsof -ti:3000 | xargs kill -9
 rm -rf .next
 
 # Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
 ```
 
 ## Environment Variables Reference
