@@ -18,13 +18,13 @@ This project uses a comprehensive testing strategy with unit tests, integration 
 
 ```bash
 # Watch mode (development)
-npm run test
+pnpm test
 
 # CI mode with coverage
-npm run test:ci
+pnpm test:ci
 
 # Run specific test file
-npm test -- file-parser.test.ts
+pnpm test -- file-parser.test.ts
 ```
 
 ### End-to-End Tests (Playwright)
