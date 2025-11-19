@@ -1,20 +1,66 @@
 import { streamText } from 'ai'
+import { z } from 'zod'
 import { defaultChatModel } from '@/lib/ai/config'
 import { createClient } from '@/lib/supabase/server'
 import { KnowledgeBaseRetriever } from '@/lib/knowledge-base/retriever'
+import { rateLimiters, getRateLimitIdentifier } from '@/lib/security/rate-limit'
+import { chatMessageSchema } from '@/lib/security/validation'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   try {
-    const { messages, fileIds } = await req.json()
     const supabase = await createClient()
 
     // Get current user
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return new Response('Unauthorized', { status: 401 })
+    }
+
+    // Rate limiting
+    const identifier = user.id || getRateLimitIdentifier(req)
+    const rateLimit = await rateLimiters.chat.checkLimit(identifier)
+    
+    if (!rateLimit.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Too many requests',
+          retryAfter: rateLimit.retryAfter,
+        }),
+        { 
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': String(rateLimit.retryAfter || 60),
+            'X-RateLimit-Limit': '20',
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(rateLimit.reset),
+          },
+        }
+      )
+    }
+
+    // Validate request body
+    const body = await req.json()
+    let messages, fileIds
+    
+    try {
+      const validated = chatMessageSchema.parse(body)
+      messages = validated.messages
+      fileIds = validated.fileIds
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Validation failed',
+            details: error.errors,
+          }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
+      throw error
     }
 
     // Get last user message

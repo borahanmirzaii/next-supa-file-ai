@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { uploadFile } from '@/lib/supabase/storage'
 import { fileRepository } from '@/lib/repositories/file-repository'
+import { rateLimiters, getRateLimitIdentifier } from '@/lib/security/rate-limit'
+import { fileUploadSchema, sanitizeFileName } from '@/lib/security/validation'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -15,12 +18,57 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Rate limiting
+    const identifier = user.id || getRateLimitIdentifier(request)
+    const rateLimit = await rateLimiters.fileUpload.checkLimit(identifier)
+    
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { 
+          error: 'Too many requests',
+          retryAfter: rateLimit.retryAfter,
+        },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': String(rateLimit.retryAfter || 60),
+            'X-RateLimit-Limit': '10',
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(rateLimit.reset),
+          },
+        }
+      )
+    }
+
     const formData = await request.formData()
     const file = formData.get('file') as File
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
+
+    // Validate file data
+    try {
+      fileUploadSchema.parse({
+        name: file.name,
+        size: file.size,
+        mime_type: file.type,
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          { 
+            error: 'Validation failed',
+            details: error.errors,
+          },
+          { status: 400 }
+        )
+      }
+      throw error
+    }
+
+    // Sanitize file name
+    const sanitizedName = sanitizeFileName(file.name)
 
     // Validate file size (50MB limit)
     const maxSize = 50 * 1024 * 1024
@@ -41,10 +89,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create file record in database
+    // Create file record in database (use sanitized name)
     const fileRecord = await fileRepository.create({
       user_id: user.id,
-      name: file.name,
+      name: sanitizedName,
       size: file.size,
       mime_type: file.type,
       storage_path: path,
