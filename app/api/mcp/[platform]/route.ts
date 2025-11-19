@@ -4,6 +4,7 @@ import { mcpClient } from '@/lib/mcp/client'
 import type { Platform } from '@/lib/mcp/server-factory'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(
   request: NextRequest,
@@ -18,7 +19,15 @@ export async function POST(
     }
 
     const platform = params.platform as Platform
-    const { method, params: requestParams } = await request.json()
+    const body = await request.json()
+    const { method, params: requestParams } = body
+
+    if (!method) {
+      return NextResponse.json(
+        { error: 'Method is required' },
+        { status: 400 }
+      )
+    }
 
     // Get integration credentials
     const { data: integration, error: integrationError } = await supabase
@@ -26,11 +35,12 @@ export async function POST(
       .select('*')
       .eq('user_id', user.id)
       .eq('platform', platform)
+      .eq('status', 'connected')
       .single()
 
     if (integrationError || !integration) {
       return NextResponse.json(
-        { error: 'Integration not found' },
+        { error: 'Integration not found or not connected' },
         { status: 404 }
       )
     }
@@ -43,14 +53,17 @@ export async function POST(
     // Execute MCP request
     const response = await mcpClient.execute(platform, {
       method,
-      params: requestParams,
+      params: requestParams || {},
     })
 
-    return NextResponse.json(response)
+    return NextResponse.json({ result: response })
   } catch (error) {
     console.error('MCP API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        error: 'Internal server error', 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      },
       { status: 500 }
     )
   }
